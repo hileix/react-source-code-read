@@ -10,12 +10,14 @@
 import invariant from 'shared/invariant';
 import warningWithoutStack from 'shared/warningWithoutStack';
 
+// 事件池可容纳的最大合成事件实例个数： 10 个 
 const EVENT_POOL_SIZE = 10;
 
 /**
  * @interface Event
  * @see http://www.w3.org/TR/DOM-Level-3-Events/
  */
+// 事件接口
 const EventInterface = {
   type: null,
   target: null,
@@ -111,28 +113,36 @@ function SyntheticEvent(
   return this;
 }
 
+// 给 SyntheticEvent（合成事件类）添加方法
 Object.assign(SyntheticEvent.prototype, {
+  // 阻止默认事件方法
   preventDefault: function() {
+    // SyntheticEvent.defaultPrevented 值设置为 true
     this.defaultPrevented = true;
+    // 取出原生 event 对象
     const event = this.nativeEvent;
     if (!event) {
       return;
     }
 
+    // 原生的 preventDefault 方法存在的话，直接调用
     if (event.preventDefault) {
       event.preventDefault();
     } else if (typeof event.returnValue !== 'unknown') {
+      // 不存在的话，直接设置 returnValue 值为 false
       event.returnValue = false;
     }
+    // SyntheticEvent.isDefaultPrevented 方法设置为一直返回 true 的方法
     this.isDefaultPrevented = functionThatReturnsTrue;
   },
-
+  // 停止事件冒泡方法
   stopPropagation: function() {
+    // 取出原生 event 对象
     const event = this.nativeEvent;
     if (!event) {
       return;
     }
-
+    // 原生的 stopPropagation 方法存在的话，直接调用
     if (event.stopPropagation) {
       event.stopPropagation();
     } else if (typeof event.cancelBubble !== 'unknown') {
@@ -141,9 +151,11 @@ Object.assign(SyntheticEvent.prototype, {
       // any references to cancelBubble throw "Member not found".  A
       // typeof check of "unknown" circumvents this issue (and is also
       // IE specific).
+      // 不存在的话，直接设置 cancelBubble 值为 true
       event.cancelBubble = true;
     }
 
+    // SyntheticEvent.isPropagationStopped 方法设置为一直返回 true 的方法
     this.isPropagationStopped = functionThatReturnsTrue;
   },
 
@@ -152,6 +164,8 @@ Object.assign(SyntheticEvent.prototype, {
    * them back into the pool. This allows a way to hold onto a reference that
    * won't be added back into the pool.
    */
+  // SyntheticEvent.isPersistent 设置为一个一直返回 true 的方法
+  // 为了阻止将合成事件实例放回事件池中
   persist: function() {
     this.isPersistent = functionThatReturnsTrue;
   },
@@ -161,6 +175,8 @@ Object.assign(SyntheticEvent.prototype, {
    *
    * @return {boolean} True if this should not be released, false otherwise.
    */
+  // 检查事件是否应该被释放到事件池中
+  // false 表示应该被释放到事件池中，true 表示不应该释放到事件池中
   isPersistent: functionThatReturnsFalse,
 
   /**
@@ -168,6 +184,7 @@ Object.assign(SyntheticEvent.prototype, {
    */
   destructor: function() {
     const Interface = this.constructor.Interface;
+    // 将所有的 Interface 的属性值都设为 null
     for (const propName in Interface) {
       if (__DEV__) {
         Object.defineProperty(
@@ -179,11 +196,14 @@ Object.assign(SyntheticEvent.prototype, {
         this[propName] = null;
       }
     }
+    // 将合成事件实例的 dispatchConfig, _targetInst, nativeEvent 设置为 null
     this.dispatchConfig = null;
     this._targetInst = null;
     this.nativeEvent = null;
+    // 将合成事件实例的 isDefaultPrevented, isPropagationStopped 方法设置为返回 false 的方法
     this.isDefaultPrevented = functionThatReturnsFalse;
     this.isPropagationStopped = functionThatReturnsFalse;
+    // 将合成事件实例的 d_dispatchListeners, _dispatchInstances 设置为 null
     this._dispatchListeners = null;
     this._dispatchInstances = null;
     if (__DEV__) {
@@ -222,11 +242,15 @@ Object.assign(SyntheticEvent.prototype, {
   },
 });
 
+// 事件接口
 SyntheticEvent.Interface = EventInterface;
 
 /**
  * Helper to reduce boilerplate when creating subclasses.
  */
+// 传入 Interface
+// 以 SyntheticEvent 为父类型，使用 寄生组合式继承 来返回子类
+// 同时通过传入的 Interface 增强子类的 Interface 静态对象
 SyntheticEvent.extend = function(Interface) {
   const Super = this;
 
@@ -297,10 +321,15 @@ function getPooledWarningPropertyDefinition(propName, getVal) {
   }
 }
 
+// 获取事件池中的合成事件实例
 function getPooledEvent(dispatchConfig, targetInst, nativeEvent, nativeInst) {
+  // 类构造函数
   const EventConstructor = this;
+  // 如果 eventPool 数组合成实例元素
   if (EventConstructor.eventPool.length) {
+    // 拿出最后一个合成事件实例元素
     const instance = EventConstructor.eventPool.pop();
+    // 调用 合成函数构造函数，更新 合成事件实例 中的 dispatchConfig/_targetInst/nativeEvent 属性
     EventConstructor.call(
       instance,
       dispatchConfig,
@@ -308,8 +337,10 @@ function getPooledEvent(dispatchConfig, targetInst, nativeEvent, nativeInst) {
       nativeEvent,
       nativeInst,
     );
+    // 返回该合成事件实例
     return instance;
   }
+  // 不存在，则 new 一个合成事件实例
   return new EventConstructor(
     dispatchConfig,
     targetInst,
@@ -318,18 +349,27 @@ function getPooledEvent(dispatchConfig, targetInst, nativeEvent, nativeInst) {
   );
 }
 
+// 释放合成事件实例
+// event 为合成事件实例
 function releasePooledEvent(event) {
+  // 合成事件类
   const EventConstructor = this;
   invariant(
     event instanceof EventConstructor,
     'Trying to release an event instance into a pool of a different type.',
   );
+  // 调用合成事件实例的 destructor，销毁合成事件的属性和方法
   event.destructor();
+  // 如果
+  // 当前事件池已有合成事件实例个数 小于 事件池容量
   if (EventConstructor.eventPool.length < EVENT_POOL_SIZE) {
+    // 则将上面的合成事件实例 push 进事件池中，以重复使用
     EventConstructor.eventPool.push(event);
   }
 }
-
+// 给合成事件类添加事件池相关的属性和方法
+// 添加 1 个静态属性：eventPool
+// 添加了 2 个静态方法：getPooledEvent、releasePooledEvent
 function addEventPoolingTo(EventConstructor) {
   EventConstructor.eventPool = [];
   EventConstructor.getPooled = getPooledEvent;
