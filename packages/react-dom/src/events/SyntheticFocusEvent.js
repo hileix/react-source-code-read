@@ -11,6 +11,7 @@ import SyntheticUIEvent from './SyntheticUIEvent';
  * @interface FocusEvent
  * @see http://www.w3.org/TR/DOM-Level-3-Events/
  */
+// focus 合成事件类
 const SyntheticFocusEvent = SyntheticUIEvent.extend({
   relatedTarget: null,
 });

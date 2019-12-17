@@ -76,6 +76,7 @@ function SyntheticEvent(
     delete this.isPropagationStopped;
   }
 
+  // 将 dispatchConfig, targetInst, nativeEvent 保存在实例对象中
   this.dispatchConfig = dispatchConfig;
   this._targetInst = targetInst;
   this.nativeEvent = nativeEvent;

@@ -6,7 +6,7 @@
  */
 
 import SyntheticEvent from 'events/SyntheticEvent';
-
+// ui 合成事件类
 const SyntheticUIEvent = SyntheticEvent.extend({
   view: null,
   detail: null,

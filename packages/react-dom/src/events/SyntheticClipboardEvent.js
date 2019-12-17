@@ -11,6 +11,7 @@ import SyntheticEvent from 'events/SyntheticEvent';
  * @interface Event
  * @see http://www.w3.org/TR/clipboard-apis/
  */
+// Clipboard 合成事件类
 const SyntheticClipboardEvent = SyntheticEvent.extend({
   clipboardData: function(event) {
     return 'clipboardData' in event

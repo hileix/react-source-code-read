@@ -11,6 +11,7 @@ import SyntheticMouseEvent from './SyntheticMouseEvent';
  * @interface WheelEvent
  * @see http://www.w3.org/TR/DOM-Level-3-Events/
  */
+// 滚轮 合成事件类
 const SyntheticWheelEvent = SyntheticMouseEvent.extend({
   deltaX(event) {
     return 'deltaX' in event

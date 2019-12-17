@@ -14,6 +14,7 @@ import getEventModifierState from './getEventModifierState';
  * @interface KeyboardEvent
  * @see http://www.w3.org/TR/DOM-Level-3-Events/
  */
+// 键盘 合成事件类
 const SyntheticKeyboardEvent = SyntheticUIEvent.extend({
   key: getEventKey,
   location: null,

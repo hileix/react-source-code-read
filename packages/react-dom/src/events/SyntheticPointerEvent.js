@@ -11,6 +11,7 @@ import SyntheticMouseEvent from './SyntheticMouseEvent';
  * @interface PointerEvent
  * @see http://www.w3.org/TR/pointerevents/
  */
+// pointer 合成事件类
 const SyntheticPointerEvent = SyntheticMouseEvent.extend({
   pointerId: null,
   width: null,

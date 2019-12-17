@@ -12,6 +12,7 @@ import getEventModifierState from './getEventModifierState';
  * @interface TouchEvent
  * @see http://www.w3.org/TR/touch-events/
  */
+// touch 合成事件类
 const SyntheticTouchEvent = SyntheticUIEvent.extend({
   touches: null,
   targetTouches: null,

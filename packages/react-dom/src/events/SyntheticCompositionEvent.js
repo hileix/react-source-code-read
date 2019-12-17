@@ -11,6 +11,7 @@ import SyntheticEvent from 'events/SyntheticEvent';
  * @interface Event
  * @see http://www.w3.org/TR/DOM-Level-3-Events/#events-compositionevents
  */
+// Composition 合成事件类
 const SyntheticCompositionEvent = SyntheticEvent.extend({
   data: null,
 });

@@ -18,6 +18,7 @@ let isMovementYSet = false;
  * @interface MouseEvent
  * @see http://www.w3.org/TR/DOM-Level-3-Events/
  */
+// 鼠标 合成事件类
 const SyntheticMouseEvent = SyntheticUIEvent.extend({
   screenX: null,
   screenY: null,

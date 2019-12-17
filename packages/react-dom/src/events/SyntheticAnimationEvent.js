@@ -12,6 +12,7 @@ import SyntheticEvent from 'events/SyntheticEvent';
  * @see http://www.w3.org/TR/css3-animations/#AnimationEvent-interface
  * @see https://developer.mozilla.org/en-US/docs/Web/API/AnimationEvent
  */
+// Animation 合成事件类
 const SyntheticAnimationEvent = SyntheticEvent.extend({
   animationName: null,
   elapsedTime: null,
