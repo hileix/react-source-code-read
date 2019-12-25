@@ -35,3 +35,8 @@ Github 的阅读体验稍显逊色，你可以选择在[我的网站](https://yu
 
 ![](https://yck-1254263422.cos.ap-shanghai.myqcloud.com/blog/2019-06-01-034138.jpg)
 ![](https://yck-1254263422.cos.ap-shanghai.myqcloud.com/blog/2019-06-01-034140.png)
+
+
+## 调试
+yarn debug-test TestName
+然后打开 Chrome，输入 `chrome://inspect`
